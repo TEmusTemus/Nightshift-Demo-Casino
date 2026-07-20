@@ -96,6 +96,19 @@ a {
 .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-8); }
 .stats p, .history li { padding: var(--space-3); margin: 0; background: var(--color-bg); border: 1px solid oklch(0.25 0.01 280); }
 .history { display: grid; gap: var(--space-2); padding: 0; list-style: none; }
+.game-stage { margin-block: var(--space-6); padding: var(--space-8); overflow: hidden; color: var(--color-ink); background: var(--color-bg); border: 1px solid oklch(0.35 0.01 280); font-size: 2rem; letter-spacing: 0.15em; text-align: center; }
+.game-stage.is-playing { animation: game-pulse 550ms cubic-bezier(0.16, 1, 0.3, 1) infinite alternate; color: var(--color-violet); }
+@keyframes game-pulse { from { transform: translateY(-4px) skewY(-2deg); filter: blur(0); } to { transform: translateY(4px) skewY(2deg); filter: blur(1px); } }
+.back-link { display: inline-flex; align-items: center; margin-bottom: var(--space-6); color: var(--color-muted); }
+.slot-machine { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); margin-block: var(--space-6); padding: var(--space-4); background: var(--color-bg); border: 1px solid oklch(0.35 0.01 280); }
+.slot-reel { display: grid; min-height: 9rem; overflow: hidden; place-items: center; color: var(--color-primary); background: var(--color-surface); border: 1px solid oklch(0.4 0.01 280); font-size: clamp(2rem, 8vw, 4rem); font-weight: 900; }
+.slot-machine.is-spinning .slot-reel span { animation: reel-spin 180ms linear infinite; }
+@keyframes reel-spin { from { transform: translateY(-150%) rotateX(0); } to { transform: translateY(150%) rotateX(720deg); } }
+.baccarat-table { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); margin-block: var(--space-6); padding: var(--space-6); background: var(--color-bg); border: 1px solid oklch(0.35 0.01 280); }
+.card-row { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
+.playing-card { display: grid; width: 3.5rem; aspect-ratio: 5 / 7; place-items: center; color: var(--color-bg); background: var(--color-ink); border-radius: 0.35rem; font-size: 1.4rem; font-weight: 900; }
+.baccarat-table.is-dealing .playing-card { animation: card-deal 500ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes card-deal { from { opacity: 0; transform: translateY(-5rem) rotateY(90deg); } to { opacity: 1; transform: translateY(0) rotateY(0); } }
 
 .placeholder-page__content {
   width: min(100%, 42rem);
