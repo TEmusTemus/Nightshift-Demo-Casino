@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { baccaratScore, calculateBaccaratPayout, calculateSlotPayout } from "../lib/games";
+import { baccaratScore, bankerDrawsThirdCard, calculateBaccaratPayout, calculateSlotPayout, playerDrawsThirdCard } from "../lib/games";
 
 describe("casino game rules", () => {
   test("scores baccarat hands with face cards as zero and drops tens", () => {
@@ -16,5 +16,12 @@ describe("casino game rules", () => {
   test("pays matching slot symbols and loses non-matches", () => {
     expect(calculateSlotPayout(["7", "7", "7"], 25)).toBe(250);
     expect(calculateSlotPayout(["7", "bar", "7"], 25)).toBe(0);
+  });
+
+  test("applies baccarat third-card rules", () => {
+    expect(playerDrawsThirdCard(5)).toBe(true);
+    expect(playerDrawsThirdCard(6)).toBe(false);
+    expect(bankerDrawsThirdCard(3, 8)).toBe(false);
+    expect(bankerDrawsThirdCard(5, 4)).toBe(true);
   });
 });

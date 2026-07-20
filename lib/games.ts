@@ -8,6 +8,17 @@ export function baccaratScore(cards: string[]) {
   }, 0) % 10;
 }
 
+export function playerDrawsThirdCard(score: number) { return score <= 5; }
+export function bankerDrawsThirdCard(score: number, playerThirdValue: number | null) {
+  if (playerThirdValue === null) return score <= 5;
+  if (score <= 2) return true;
+  if (score === 3) return playerThirdValue !== 8;
+  if (score === 4) return playerThirdValue >= 2 && playerThirdValue <= 7;
+  if (score === 5) return playerThirdValue >= 4 && playerThirdValue <= 7;
+  if (score === 6) return playerThirdValue === 6 || playerThirdValue === 7;
+  return false;
+}
+
 export function calculateBaccaratPayout(bet: BaccaratBet, outcome: BaccaratOutcome, amount: number) {
   if (bet !== outcome) return 0;
   if (outcome === "tie") return amount * 9;
