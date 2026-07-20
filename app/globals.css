@@ -61,6 +61,40 @@ a {
   margin-inline: auto;
 }
 
+.placeholder-page {
+  display: grid;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  place-items: center;
+}
+
+.placeholder-page__content {
+  width: min(100%, 42rem);
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid oklch(0.31 0.01 280);
+}
+
+.placeholder-page__label {
+  margin-bottom: var(--space-4);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.placeholder-page h1 {
+  max-width: 16ch;
+  font-size: 3rem;
+}
+
+.placeholder-page__description {
+  max-width: 38rem;
+  margin-bottom: var(--space-8);
+  color: var(--color-muted);
+}
+
 .site-header {
   display: flex;
   align-items: center;
