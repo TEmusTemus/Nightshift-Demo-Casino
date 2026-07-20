@@ -5,8 +5,8 @@ A virtual-chip-only Next.js casino demo with Slot, Baccarat, account balances, t
 ## Run locally
 
 ```powershell
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Open `http://localhost:3000`, create a demo account, add virtual chips on the Account page, then play Slot or Baccarat.
@@ -14,8 +14,8 @@ Open `http://localhost:3000`, create a demo account, add virtual chips on the Ac
 ## Verify
 
 ```powershell
-npm test
-npm run build
+bun run test
+bun run build
 ```
 
 ## SQLite database
