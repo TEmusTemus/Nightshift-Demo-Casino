@@ -20,7 +20,21 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
   useEffect(() => setUser(current()), []);
 
   async function play() {
-    if (!user || playing) return setResult("Create an account or sign in before playing.");
+    if (playing) return;
+    if (!user) {
+      setResult("");
+      setPlaying(true);
+      if (game === "baccarat") {
+        setCards({ player: ["A♠", "7♦"], banker: ["K♥", "3♣"] });
+        setDealing(true);
+        await delay(900);
+        setDealing(false);
+      } else {
+        await delay(1600);
+      }
+      setPlaying(false);
+      return setResult("Create an account or sign in to play with demo chips.");
+    }
 
     setPlaying(true);
     setResult("");
