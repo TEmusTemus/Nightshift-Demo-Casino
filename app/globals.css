@@ -101,14 +101,17 @@ a {
 @keyframes game-pulse { from { transform: translateY(-4px) skewY(-2deg); filter: blur(0); } to { transform: translateY(4px) skewY(2deg); filter: blur(1px); } }
 .back-link { display: inline-flex; align-items: center; margin-bottom: var(--space-6); color: var(--color-muted); }
 .slot-machine { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); margin-block: var(--space-6); padding: var(--space-4); background: var(--color-bg); border: 1px solid oklch(0.35 0.01 280); }
-.slot-reel { display: grid; min-height: 9rem; overflow: hidden; place-items: center; color: var(--color-primary); background: var(--color-surface); border: 1px solid oklch(0.4 0.01 280); font-size: clamp(2rem, 8vw, 4rem); font-weight: 900; }
-.slot-machine.is-spinning .slot-reel span { animation: reel-spin 180ms linear infinite; }
-@keyframes reel-spin { from { transform: translateY(-150%) rotateX(0); } to { transform: translateY(150%) rotateX(720deg); } }
-.baccarat-table { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); margin-block: var(--space-6); padding: var(--space-6); background: var(--color-bg); border: 1px solid oklch(0.35 0.01 280); }
+.slot-reel { min-width: 0; height: 9rem; overflow: hidden; color: var(--color-primary); background: var(--color-surface); border: 1px solid oklch(0.4 0.01 280); font-size: clamp(2rem, 8vw, 4rem); font-weight: 900; }
+.slot-reel__viewport { height: 100%; overflow: hidden; }
+.slot-reel__strip { display: grid; grid-auto-rows: 9rem; transform: translateY(0); will-change: transform; }
+.slot-reel__symbol { display: grid; place-items: center; }
+.slot-machine--spinning .slot-reel__strip { animation: reel-cycle 380ms linear infinite; animation-delay: var(--reel-delay); }
+@keyframes reel-cycle { from { transform: translateY(0); } to { transform: translateY(-54rem); } }
+.baccarat-table { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); margin-block: var(--space-6); padding: var(--space-6); perspective: 50rem; background: var(--color-bg); border: 1px solid oklch(0.35 0.01 280); }
 .card-row { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
 .playing-card { display: grid; width: 3.5rem; aspect-ratio: 5 / 7; place-items: center; color: var(--color-bg); background: var(--color-ink); border-radius: 0.35rem; font-size: 1.4rem; font-weight: 900; }
-.baccarat-table.is-dealing .playing-card { animation: card-deal 500ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-@keyframes card-deal { from { opacity: 0; transform: translateY(-5rem) rotateY(90deg); } to { opacity: 1; transform: translateY(0) rotateY(0); } }
+.playing-card--dealing { animation: card-deal 650ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes card-deal { from { opacity: 0; transform: translate3d(0, -5rem, 3rem) rotateY(90deg); } to { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0); } }
 
 .placeholder-page__content {
   width: min(100%, 42rem);
