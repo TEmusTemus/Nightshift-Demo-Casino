@@ -1,0 +1,6 @@
+import { NextResponse } from "next/server";
+import { chips, invalid } from "../../../../lib/api";
+import { db, getUser } from "../../../../lib/db";
+import { calculateSlotPayout } from "../../../../lib/games";
+const symbols = ["7", "7", "7", "bar", "bar", "cherry", "cherry", "lemon"];
+export async function POST(request: Request) { const { userId, betAmount } = await request.json(); const bet = chips(betAmount); const user = getUser(Number(userId)); if (!user || !bet || bet > user.balance) return invalid("Insufficient virtual-chip balance."); const reels = Array.from({ length: 3 }, () => symbols[Math.floor(Math.random() * symbols.length)]); const payout = calculateSlotPayout(reels, bet); const settle = db.transaction(() => { db.prepare("UPDATE users SET balance = balance - ? + ? WHERE id = ?").run(bet, payout, user.id); db.prepare("INSERT INTO slot_spins (user_id, symbols, win_amount) VALUES (?, ?, ?)").run(user.id, JSON.stringify(reels), payout); db.prepare("INSERT INTO transactions (user_id, game_type, bet_amount, result, payout) VALUES (?, 'slot', ?, ?, ?)").run(user.id, bet, payout ? "win" : "loss", payout); }); settle(); return NextResponse.json({ symbols: reels, payout, user: getUser(user.id) }); }

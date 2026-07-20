@@ -3,6 +3,7 @@ import Link from "next/link";
 const navigationLinks = [
   { href: "/slot", label: "Slot" },
   { href: "/baccarat", label: "Baccarat" },
+  { href: "/account", label: "Account" },
 ];
 
 export function Navigation() {

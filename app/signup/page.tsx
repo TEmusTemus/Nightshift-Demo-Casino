@@ -1,11 +1,2 @@
-import { PlaceholderPage } from "@/components/placeholder-page";
-
-export default function Signup() {
-  return (
-    <PlaceholderPage
-      title="Create your demo account"
-      description="Demo registration arrives with the account phase."
-      returnHref="/"
-    />
-  );
-}
+import { AccountForm } from "@/components/demo-client";
+export default function Signup() { return <AccountForm mode="signup" />; }
