@@ -1,0 +1,19 @@
+@import "../styles/tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--color-bg);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-kerning: normal;
+}
