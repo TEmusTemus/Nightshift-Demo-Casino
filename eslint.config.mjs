@@ -5,6 +5,7 @@ export default defineConfig([
   ...nextCoreWebVitals,
   globalIgnores([".next/**", ".worktrees/**", "node_modules/**", "playwright-report/**", "test-results/**"]),
   {
+    files: ["components/demo-client.tsx"],
     rules: {
       "@next/next/no-html-link-for-pages": "off",
       "react-hooks/exhaustive-deps": "off",

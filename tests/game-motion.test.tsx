@@ -52,7 +52,30 @@ test("slot strips repeat symbols before their final outcome", () => {
 
   document.querySelectorAll(".slot-reel__strip").forEach((strip) => {
     expect(strip.querySelectorAll(".slot-reel__symbol")).toHaveLength(12);
+    expect(strip).toHaveStyle({ "--reel-distance": "-99rem" });
   });
+});
+
+test("slot settles immediately when reduced motion is requested", async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("matchMedia", vi.fn().mockReturnValue({ matches: true }));
+  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({
+    symbols: ["7", "BAR", "✦"],
+    payout: 50,
+    user: { id: 1, username: "player", balance: 1025 },
+  }), { status: 200 }));
+  localStorage.setItem("nightshift-user", JSON.stringify({ id: 1, username: "player", balance: 1000 }));
+  render(<GameClient game="slot" />);
+
+  fireEvent.click(screen.getByRole("button", { name: "Spin" }));
+  await vi.runAllTicks();
+  await vi.advanceTimersByTimeAsync(0);
+
+  expect(screen.getByRole("status")).toHaveTextContent("7 · BAR · ✦ — payout 50 chips");
+  expect(screen.getByLabelText("Bet amount")).not.toBeDisabled();
+  fetchMock.mockRestore();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 test("baccarat has individual cards that can receive a deal animation", () => {

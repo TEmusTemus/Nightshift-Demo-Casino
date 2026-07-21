@@ -11,6 +11,7 @@ const REEL_SYMBOLS = ["✦", "7", "BAR", "♦", "$"];
 const playSpinSound = () => undefined;
 const playStopSound = () => undefined;
 const reelSymbols = (visible: string, result: string) => [visible, ...REEL_SYMBOLS, ...REEL_SYMBOLS, result];
+const slotStopTimes = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? [0, 0, 0] as const : SLOT_STOP_MS;
 
 export function GameClient({ game }: { game: "slot" | "baccarat" }) {
   const [user, setUser] = useState<User | null>(null);
@@ -38,15 +39,16 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
         setDealing(false);
       } else {
         const previewOutcome = ["♦", "$", "7"];
+        const stopTimes = slotStopTimes();
         setSlotOutcome(previewOutcome);
         setSpinningReels([true, true, true]);
         playSpinSound();
-        SLOT_STOP_MS.forEach((stopAt, index) => window.setTimeout(() => {
+        stopTimes.forEach((stopAt, index) => window.setTimeout(() => {
           setSpinningReels((reels) => reels.map((isSpinning, reelIndex) => reelIndex === index ? false : isSpinning));
           setSymbols((reels) => reels.map((symbol, reelIndex) => reelIndex === index ? previewOutcome[index] : symbol));
           playStopSound();
         }, stopAt));
-        await delay(SLOT_STOP_MS[2]);
+        await delay(stopTimes[2]);
       }
       setPlaying(false);
       return setResult("Create an account or sign in to play with demo chips.");
@@ -70,15 +72,16 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
 
     if (game === "slot") {
       const finalSymbols = body.symbols.map((symbol: string) => symbol.toUpperCase());
+      const stopTimes = slotStopTimes();
       setSlotOutcome(finalSymbols);
       setSpinningReels([true, true, true]);
       playSpinSound();
-      SLOT_STOP_MS.forEach((stopAt, index) => window.setTimeout(() => {
+      stopTimes.forEach((stopAt, index) => window.setTimeout(() => {
         setSpinningReels((reels) => reels.map((isSpinning, reelIndex) => reelIndex === index ? false : isSpinning));
         setSymbols((reels) => reels.map((symbol, reelIndex) => reelIndex === index ? finalSymbols[index] : symbol));
         playStopSound();
       }, stopAt));
-      await delay(SLOT_STOP_MS[2]);
+      await delay(stopTimes[2]);
       setUser(body.user);
       save(body.user);
       setPlaying(false);
@@ -100,7 +103,7 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
       {symbols.map((symbol, index) => (
         <div className={spinningReels[index] ? "slot-reel slot-reel--spinning" : "slot-reel"} key={index}>
           <div className="slot-reel__viewport">
-            <div className="slot-reel__strip" style={{ "--reel-duration": `${SLOT_STOP_MS[index]}ms`, "--reel-distance": "-90rem" } as CSSProperties}>
+            <div className="slot-reel__strip" style={{ "--reel-duration": `${SLOT_STOP_MS[index]}ms`, "--reel-distance": "-99rem" } as CSSProperties}>
               {reelSymbols(symbol, slotOutcome[index]).map((reelSymbol, reelIndex) => <span className="slot-reel__symbol" key={`${reelSymbol}-${reelIndex}`}>{reelSymbol}</span>)}
             </div>
           </div>
