@@ -2,6 +2,15 @@
 
 A virtual-chip-only Next.js casino demo with Slot, Baccarat, account balances, transaction history, and SQLite persistence. It contains no real-money payments or prizes.
 
+<img width="1126" height="554" alt="image" src="https://github.com/user-attachments/assets/2aba442f-788c-4413-9ddc-f517fe02bdf3" />
+
+<img width="923" height="563" alt="image" src="https://github.com/user-attachments/assets/a79053e3-c37b-4481-a444-379ca67a62d8" />
+
+<img width="748" height="537" alt="image" src="https://github.com/user-attachments/assets/894c5307-96b1-4df7-abe0-f8605d9a7bea" />
+
+
+
+
 ## Run locally
 
 ```powershell
