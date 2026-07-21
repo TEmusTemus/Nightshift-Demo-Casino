@@ -4,3 +4,23 @@ node_modules/
 coverage/
 playwright-report/
 test-results/
+tsconfig.tsbuildinfo
+
+# Local environment and credential material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+secrets.*
+AGENTS.md
+
+# Local application data and SQLite journals
+db/
+*.db
+*.db-shm
+*.db-wal
