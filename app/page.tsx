@@ -1,10 +1,12 @@
 import { GameEntry } from "../components/game-entry";
 import { Navigation } from "../components/navigation";
 import { OrbitConsole } from "../components/orbit-console";
+import { SignalField } from "../components/signal-field";
 
 export default function HomePage() {
   return (
     <main>
+      <SignalField />
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>

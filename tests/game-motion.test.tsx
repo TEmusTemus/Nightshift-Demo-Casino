@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import { GameClient } from "@/components/demo-client";
 
@@ -75,6 +75,28 @@ test("slot settles immediately when reduced motion is requested", async () => {
   expect(screen.getByLabelText("Bet amount")).not.toBeDisabled();
   fetchMock.mockRestore();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
+
+test("slot spins together before reels land in sequence", async () => {
+  vi.useFakeTimers();
+  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({
+    symbols: ["7", "BAR", "✦"], payout: 50, user: { id: 1, username: "player", balance: 1025 },
+  }), { status: 200 }));
+  localStorage.setItem("nightshift-user", JSON.stringify({ id: 1, username: "player", balance: 1000 }));
+  render(<GameClient game="slot" />);
+
+  fireEvent.click(screen.getByRole("button", { name: "Spin" }));
+  await vi.runAllTicks();
+  await vi.advanceTimersByTimeAsync(0);
+  expect(document.querySelectorAll(".slot-reel--spinning")).toHaveLength(3);
+  await act(async () => { await vi.advanceTimersByTimeAsync(1251); });
+  expect(document.querySelectorAll(".slot-reel--landing")).toHaveLength(1);
+  await act(async () => { await vi.advanceTimersByTimeAsync(449); });
+  expect(document.querySelectorAll(".slot-reel--settled")).toHaveLength(1);
+  expect(document.querySelectorAll(".slot-reel--landing")).toHaveLength(1);
+  expect(document.querySelectorAll(".slot-reel--spinning")).toHaveLength(1);
+  fetchMock.mockRestore();
   vi.useRealTimers();
 });
 

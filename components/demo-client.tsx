@@ -6,7 +6,9 @@ const save = (user: User) => { localStorage.setItem("nightshift-user", JSON.stri
 export function AccountForm({ mode }: { mode: "login" | "signup" }) { const [user, setUser] = useState<User | null>(null); const [message, setMessage] = useState(""); useEffect(() => setUser(current()), []); async function submit(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); const r = await fetch(`/api/auth/${mode === "signup" ? "register" : "login"}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: f.get("username"), password: f.get("password") }) }); const b = await r.json(); if (!r.ok) return setMessage(b.error); save(b.user); setUser(b.user); setMessage(`Welcome, ${b.user.username}. Balance: ${b.user.balance} chips.`); } return <section className="app-panel"><h1>{mode === "signup" ? "Create your demo account" : "Sign in"}</h1>{user ? <p>{message}</p> : <form onSubmit={submit}><label>Username<input name="username" minLength={3} required /></label><label>Password<input name="password" type="password" minLength={6} required /></label><button className="button button--primary">{mode === "signup" ? "Create account" : "Sign in"}</button></form>}<p role="status">{message}</p><a href="/">Back to NIGHTSHIFT</a></section>; }
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const SLOT_STOP_MS = [1700, 2000, 2300] as const;
+const SLOT_LANDING_MS = 450;
 const REEL_SYMBOLS = ["✦", "7", "BAR", "♦", "$"];
+type ReelPhase = "spinning" | "landing" | "settled";
 // Audio assets can be connected here without changing the animation lifecycle.
 const playSpinSound = () => undefined;
 const playStopSound = () => undefined;
@@ -22,10 +24,31 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
   const [dealing, setDealing] = useState(false);
   const [symbols, setSymbols] = useState(["7", "BAR", "✦"]);
   const [slotOutcome, setSlotOutcome] = useState(["7", "BAR", "✦"]);
-  const [spinningReels, setSpinningReels] = useState([false, false, false]);
+  const [reelPhases, setReelPhases] = useState<ReelPhase[]>(["settled", "settled", "settled"]);
   const [cards, setCards] = useState({ player: ["?", "?"], banker: ["?", "?"] });
 
   useEffect(() => setUser(current()), []);
+
+  function runSlotTimeline(outcome: string[]) {
+    const stopTimes = slotStopTimes();
+    setSlotOutcome(outcome);
+    if (stopTimes[2] === 0) {
+      setSymbols(outcome);
+      setReelPhases(["settled", "settled", "settled"]);
+      return Promise.resolve();
+    }
+    setReelPhases(["spinning", "spinning", "spinning"]);
+    playSpinSound();
+    stopTimes.forEach((stopAt, index) => {
+      window.setTimeout(() => setReelPhases((phases) => phases.map((phase, reelIndex) => reelIndex === index ? "landing" : phase)), stopAt - SLOT_LANDING_MS);
+      window.setTimeout(() => {
+        setReelPhases((phases) => phases.map((phase, reelIndex) => reelIndex === index ? "settled" : phase));
+        setSymbols((reels) => reels.map((symbol, reelIndex) => reelIndex === index ? outcome[index] : symbol));
+        playStopSound();
+      }, stopAt);
+    });
+    return delay(stopTimes[2]);
+  }
 
   async function play() {
     if (playing) return;
@@ -39,16 +62,7 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
         setDealing(false);
       } else {
         const previewOutcome = ["♦", "$", "7"];
-        const stopTimes = slotStopTimes();
-        setSlotOutcome(previewOutcome);
-        setSpinningReels([true, true, true]);
-        playSpinSound();
-        stopTimes.forEach((stopAt, index) => window.setTimeout(() => {
-          setSpinningReels((reels) => reels.map((isSpinning, reelIndex) => reelIndex === index ? false : isSpinning));
-          setSymbols((reels) => reels.map((symbol, reelIndex) => reelIndex === index ? previewOutcome[index] : symbol));
-          playStopSound();
-        }, stopAt));
-        await delay(stopTimes[2]);
+        await runSlotTimeline(previewOutcome);
       }
       setPlaying(false);
       return setResult("Create an account or sign in to play with demo chips.");
@@ -72,16 +86,7 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
 
     if (game === "slot") {
       const finalSymbols = body.symbols.map((symbol: string) => symbol.toUpperCase());
-      const stopTimes = slotStopTimes();
-      setSlotOutcome(finalSymbols);
-      setSpinningReels([true, true, true]);
-      playSpinSound();
-      stopTimes.forEach((stopAt, index) => window.setTimeout(() => {
-        setSpinningReels((reels) => reels.map((isSpinning, reelIndex) => reelIndex === index ? false : isSpinning));
-        setSymbols((reels) => reels.map((symbol, reelIndex) => reelIndex === index ? finalSymbols[index] : symbol));
-        playStopSound();
-      }, stopAt));
-      await delay(stopTimes[2]);
+      await runSlotTimeline(finalSymbols);
       setUser(body.user);
       save(body.user);
       setPlaying(false);
@@ -101,7 +106,7 @@ export function GameClient({ game }: { game: "slot" | "baccarat" }) {
   const stage = game === "slot" ? (
     <div className={playing ? "slot-machine slot-machine--spinning" : "slot-machine"} aria-label="Slot reels">
       {symbols.map((symbol, index) => (
-        <div className={spinningReels[index] ? "slot-reel slot-reel--spinning" : "slot-reel"} key={index}>
+        <div className={`slot-reel slot-reel--${reelPhases[index]}`} key={index}>
           <div className="slot-reel__viewport">
             <div className="slot-reel__strip" style={{ "--reel-duration": `${SLOT_STOP_MS[index]}ms`, "--reel-distance": "-99rem" } as CSSProperties}>
               {reelSymbols(symbol, slotOutcome[index]).map((reelSymbol, reelIndex) => <span className="slot-reel__symbol" key={`${reelSymbol}-${reelIndex}`}>{reelSymbol}</span>)}
