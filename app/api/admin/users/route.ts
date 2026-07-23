@@ -1,3 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "../../../../lib/db";
-export function GET() { return NextResponse.json({ users: db.prepare("SELECT id, username, balance, role, created_at FROM users ORDER BY id DESC").all() }); }
+import { runtimeUsers } from "../../../../lib/runtime-db";
+import { forbidden, unauthorized } from "../../../../lib/api";
+import { sessionUser } from "../../../../lib/auth";
+export async function GET(request: Request) { const user = await sessionUser(request); if (!user) return unauthorized(); if (user.role !== "admin") return forbidden(); return NextResponse.json({ users: await runtimeUsers() }); }

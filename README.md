@@ -1,6 +1,6 @@
 # NIGHTSHIFT Demo Casino
 
-A virtual-chip-only Next.js casino demo with Slot, Baccarat, account balances, transaction history, and SQLite persistence. It contains no real-money payments or prizes.
+A virtual-chip-only Next.js casino demo with Slot, Baccarat, account balances, transaction history, and SQLite persistence for local development. It contains no real-money payments or prizes.
 
 <img width="1126" height="554" alt="image" src="https://github.com/user-attachments/assets/2aba442f-788c-4413-9ddc-f517fe02bdf3" />
 
@@ -29,11 +29,17 @@ bun run build
 
 ## SQLite database
 
-The application creates `db/casino.db` automatically with `users`, `transactions`, `slot_spins`, and `baccarat_rounds` tables. Open that file in DB Browser for SQLite (`H:\DB.Browser.for.SQLite-v3.13.1-win64`) to inspect demo data.
+The application creates `db/casino.db` automatically with `users`, `transactions`, `slot_spins`, and `baccarat_rounds` tables. SQLite is for local development only; never deploy it on ephemeral/serverless storage.
+
+## Deployment configuration
+
+Set `SESSION_SECRET` to at least 32 random bytes and configure a durable PostgreSQL `DATABASE_URL` (see `.env.example`). Sessions are signed, HTTP-only, `SameSite=Lax` cookies and are marked `Secure` in production. Do not expose database credentials to the browser.
+
+Provision the first administrator explicitly in the database, for example: `UPDATE users SET role = 'admin' WHERE username = 'your-admin';`. The admin API and page reject unsigned users and non-admin roles.
 
 ## Notes
 
 - Passwords are hashed with bcrypt.
-- API writes use SQLite transactions for game settlement.
-- The current browser session stores only the demo user id/balance in local storage; this is intentionally a demo, not production authentication.
+- API writes use conditional SQLite transactions for local game settlement, so a balance cannot be overspent by simultaneous requests.
+- The browser does not persist account identity; every protected API derives the user from the signed session cookie.
 - Keep visual changes aligned with `DESIGN.md` and run the test/build commands after edits.

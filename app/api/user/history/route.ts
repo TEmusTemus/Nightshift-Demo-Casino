@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { invalid } from "../../../../lib/api";
-import { db, getUser } from "../../../../lib/db";
+import { unauthorized } from "../../../../lib/api";
+import { getRuntimeUser, runtimeHistory } from "../../../../lib/runtime-db";
 import { summarizeTransactions } from "../../../../lib/stats";
-export function GET(request: Request) { const userId = Number(new URL(request.url).searchParams.get("userId")); if (!getUser(userId)) return invalid("Account not found.", 404); const rows = db.prepare("SELECT game_type, bet_amount, result, payout, created_at FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 50").all(userId) as Array<{ game_type: string; bet_amount: number; result: string; payout: number; created_at: string }>; return NextResponse.json({ user: getUser(userId), transactions: rows, stats: summarizeTransactions(rows) }); }
+import { sessionUser } from "../../../../lib/auth";
+export async function GET(request: Request) { const user = await sessionUser(request); if (!user) return unauthorized(); const rows = await runtimeHistory(user.id); return NextResponse.json({ user: await getRuntimeUser(user.id), transactions: rows, stats: summarizeTransactions(rows) }); }
