@@ -23,16 +23,16 @@ test("slot starts its reel motion before prompting an unsigned visitor to sign i
 
 test("slot locks its bet controls and withholds status until all reels settle", async () => {
   vi.useFakeTimers();
-  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({
+  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValueOnce(new Response(JSON.stringify({ user: { id: 1, username: "player", balance: 1000 } }), { status: 200 })).mockResolvedValueOnce(new Response(JSON.stringify({
     symbols: ["7", "BAR", "✦"],
     payout: 50,
     user: { id: 1, username: "player", balance: 1025 },
   }), { status: 200 }));
-  localStorage.setItem("nightshift-user", JSON.stringify({ id: 1, username: "player", balance: 1000 }));
   render(<GameClient game="slot" />);
+  await act(async () => { await Promise.resolve(); await Promise.resolve(); });
 
   fireEvent.click(screen.getByRole("button", { name: "Spin" }));
-  await vi.runAllTicks();
+  await act(async () => { await Promise.resolve(); await Promise.resolve(); });
   await vi.advanceTimersByTimeAsync(0);
 
   expect(screen.getByLabelText("Bet amount")).toBeDisabled();
@@ -59,16 +59,16 @@ test("slot strips repeat symbols before their final outcome", () => {
 test("slot settles immediately when reduced motion is requested", async () => {
   vi.useFakeTimers();
   vi.stubGlobal("matchMedia", vi.fn().mockReturnValue({ matches: true }));
-  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({
+  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValueOnce(new Response(JSON.stringify({ user: { id: 1, username: "player", balance: 1000 } }), { status: 200 })).mockResolvedValueOnce(new Response(JSON.stringify({
     symbols: ["7", "BAR", "✦"],
     payout: 50,
     user: { id: 1, username: "player", balance: 1025 },
   }), { status: 200 }));
-  localStorage.setItem("nightshift-user", JSON.stringify({ id: 1, username: "player", balance: 1000 }));
   render(<GameClient game="slot" />);
+  await act(async () => { await Promise.resolve(); await Promise.resolve(); });
 
   fireEvent.click(screen.getByRole("button", { name: "Spin" }));
-  await vi.runAllTicks();
+  await act(async () => { await Promise.resolve(); await Promise.resolve(); });
   await vi.advanceTimersByTimeAsync(0);
 
   expect(screen.getByRole("status")).toHaveTextContent("7 · BAR · ✦ — payout 50 chips");
@@ -80,14 +80,14 @@ test("slot settles immediately when reduced motion is requested", async () => {
 
 test("slot spins together before reels land in sequence", async () => {
   vi.useFakeTimers();
-  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({
+  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValueOnce(new Response(JSON.stringify({ user: { id: 1, username: "player", balance: 1000 } }), { status: 200 })).mockResolvedValueOnce(new Response(JSON.stringify({
     symbols: ["7", "BAR", "✦"], payout: 50, user: { id: 1, username: "player", balance: 1025 },
   }), { status: 200 }));
-  localStorage.setItem("nightshift-user", JSON.stringify({ id: 1, username: "player", balance: 1000 }));
   render(<GameClient game="slot" />);
+  await act(async () => { await Promise.resolve(); await Promise.resolve(); });
 
   fireEvent.click(screen.getByRole("button", { name: "Spin" }));
-  await vi.runAllTicks();
+  await act(async () => { await Promise.resolve(); await Promise.resolve(); });
   await vi.advanceTimersByTimeAsync(0);
   expect(document.querySelectorAll(".slot-reel--spinning")).toHaveLength(3);
   await act(async () => { await vi.advanceTimersByTimeAsync(1251); });

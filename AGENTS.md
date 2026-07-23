@@ -8,13 +8,14 @@ When adding a new language or framework, follow its conventional layout and upda
 
 ## Build, Test, and Development Commands
 
-No build system, runtime, or test runner is configured yet. When one is introduced, record the exact commands here and make them reproducible from a clean checkout. A typical JavaScript setup would be:
+Use the Bun scripts from `package.json`:
 
 ```powershell
-npm install       # Install declared dependencies
-npm run dev       # Start the local development server
-npm test          # Run the automated test suite
-npm run lint      # Check formatting and code-quality rules
+bun install       # Install declared dependencies
+bun run dev       # Start the local development server
+bun run test      # Run the automated test suite
+bun run lint      # Check formatting and code-quality rules
+bun run build     # Create a production build
 ```
 
 Prefer scripts defined in the project manifest over undocumented one-off commands.
